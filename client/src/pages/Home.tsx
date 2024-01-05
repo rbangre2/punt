@@ -3,10 +3,16 @@ import Header from '../components/Header';
 import BalanceDisplay from '../components/BalanceDisplay';
 import NavigationTabs from '../components/NavigationTabs';
 import { Container } from '@mui/material';
+import { Box, Card, CardContent } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; // Make sure to import useNavigate hook
+
+
 
 const Home = () => {
-    const [balance, setBalance] = useState(0);
+    const [balance, setBalance] = useState(0); // This would be fetched from your user state or context
     const [currentTab, setCurrentTab] = useState(0);
+    const [username, setUsername] = useState('User'); // Replace with actual username from auth state or context
+    const navigate = useNavigate();
 
     const handleTabChange = (
         event: React.SyntheticEvent<Element, Event>,
@@ -15,19 +21,17 @@ const Home = () => {
         setCurrentTab(newValue);
     };
 
-
     return (
         <div>
-            <Header /> 
-            <Container>
-                <BalanceDisplay balance={balance} />
-                <NavigationTabs currentTab={currentTab} onChange={handleTabChange} />
-                {currentTab === 0 && <div>Current Games Content</div>}
-                {currentTab === 1 && <div>My Bets Content</div>}
-                {currentTab === 2 && <div>Friends & Groups Content</div>}
-            </Container>
+            <Header 
+              balance={balance} 
+              username={username}
+              currentTab={currentTab} 
+              onTabChange={handleTabChange} 
+            />
+            {/* Rest of the content */}
         </div>
-    ); 
+    );
 }; 
 
 export default Home; 
