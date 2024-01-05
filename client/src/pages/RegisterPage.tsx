@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import {
   Grid,
   Paper,
@@ -24,11 +25,54 @@ const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const navigate = useNavigate();
 
-  const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Handle the registration logic here
+  
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+  
+    try {
+      const response = await fetch('http://localhost:8080/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          username: username,
+          password: password,
+        }),
+      });
+  
+      if (!response.ok) {
+        // Handle HTTP errors
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+  
+      // Check if the response has content
+      const text = await response.text(); // Read response body as text
+      if (text) {
+        // If there's content, try to parse it as JSON
+        const data = JSON.parse(text);
+        console.log("Registration successful", data);
+        // Redirect to the sign-in page upon successful registration
+        navigate('/signin');
+      } else {
+        // If there's no content, assume registration was successful
+        console.log("Registration successful, no response data");
+        navigate('/signin'); // Redirect even if there's no data
+      }
+    } catch (error) {
+      console.error("Registration failed", error);
+      // Here you might want to display a user-friendly error message
+    }
   };
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -79,6 +123,19 @@ const RegisterPage: React.FC = () => {
                 autoFocus
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+              />
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                id="username"
+                label="Username"
+                name="username"
+                autoComplete="username"
+                autoFocus
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
               <TextField
                 variant="outlined"

@@ -5,22 +5,24 @@ import (
     "net/http"
     "punt/database"
     "punt/models"
-
+    "log"
+    "os"
+    "time"
+    
     "golang.org/x/crypto/bcrypt"
     "github.com/dgrijalva/jwt-go"
+    "database/sql"
 	"github.com/joho/godotenv"
 )
 
 
-func Login(db *sql.DB) http.HandlerFunc {
-	var err error
-	
+func LoginHandler(db *sql.DB) http.HandlerFunc {
 	err := godotenv.Load()
     if err != nil {
         log.Fatal("Error loading .env file")
     }
 
-	var jwtSecret := os.Getenv("JWT_SECRET")
+	jwtSecret := os.Getenv("JWT_SECRET")
 	var jwtKey = []byte(jwtSecret)
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -63,5 +65,34 @@ func Login(db *sql.DB) http.HandlerFunc {
             Value:   tokenString,
             Expires: expirationTime,
         })
+    }
+}
+
+func RegisterHandler(db *sql.DB) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        var user models.User
+        err := json.NewDecoder(r.Body).Decode(&user)
+        if err != nil {
+            http.Error(w, "Invalid request body", http.StatusBadRequest)
+            return
+        }
+
+        hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+        if err != nil {
+            http.Error(w, "Error hashing password", http.StatusInternalServerError)
+            return
+        }
+        user.Password = string(hashedPassword)
+        user.CreatedAt = time.Now()
+
+        // Create user in the database
+        err = database.CreateUser(db, user)
+        if err != nil {
+            log.Printf("Error creating user: %v", err) // This will print the specific error
+            http.Error(w, "Error creating user", http.StatusInternalServerError)
+            return
+        }
+
+        w.WriteHeader(http.StatusCreated)
     }
 }

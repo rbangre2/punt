@@ -4,9 +4,13 @@ package middleware
 import (
     "net/http"
     "strings"
+    "os"
 
     "github.com/dgrijalva/jwt-go"
+    "punt/models"
 )
+
+var jwtKey = []byte(os.Getenv("JWT_SECRET"))
 
 func Authenticate(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

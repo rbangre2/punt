@@ -3,9 +3,12 @@ package main
 import (
     "fmt"
     "log"
-
+    "net/http"
+ 
     _ "github.com/go-sql-driver/mysql"
     "punt/database"
+    "punt/middleware"
+    "punt/handlers"
 )
 
 func main() {
@@ -15,18 +18,9 @@ func main() {
     }
     defer db.Close()
 
-    // Ping the database to test the connection
-    err = db.Ping()
-    if err != nil {
-        log.Fatalf("Could not ping the database: %v", err)
-    }
-    fmt.Println("Successfully connected to the database.")
-
-    user, err := database.GetUserByEmail(db, "newuser@example.com")
-    if err != nil {
-        log.Fatalf("Error getting user by email: %v", err)
-    }
-
-    // Print the details of the user retrieved.
-    fmt.Printf("User found: %+v\n", user)
+    http.Handle("/register", middleware.EnableCORS(handlers.RegisterHandler(db)))
+    http.Handle("/login", middleware.EnableCORS(handlers.LoginHandler(db)))
+    
+    fmt.Println("Starting server on :8080")
+    log.Fatal(http.ListenAndServe(":8080", nil))
 }
