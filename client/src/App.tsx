@@ -5,16 +5,20 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Home from './pages/Home';
 import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext'; // Adjust the path based on your directory structure
+
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Navigate replace to="/signin" />} />
-        <Route path="/signin" element={<LoginPage />} />
-        <Route path="/signup" element={<RegisterPage />} />
-        <Route path="/home" element={<ProtectedRoute> <Home /> </ProtectedRoute>}/>
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Navigate replace to="/signin" />} />
+          <Route path="/signin" element={<LoginPage />} />
+          <Route path="/signup" element={<RegisterPage />} />
+          <Route path="/home" element={<ProtectedRoute> <Home /> </ProtectedRoute>}/>
+        </Routes>
+      </AuthProvider>
     </Router>
   );
 }

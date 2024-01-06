@@ -14,6 +14,7 @@ import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import entryImage from "../resources/entryimage.png";
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../context/AuthContext";
 
 
 const theme = createTheme({
@@ -25,46 +26,13 @@ const theme = createTheme({
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+
+  const { login } = useAuth();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  
-    try {
-      const response = await fetch('http://localhost:8080/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-      });
-  
-      if (!response.ok) {
-        // Handle HTTP errors, e.g., 401 Unauthorized
-        throw new Error(`HTTP error: ${response.status}`);
-      }
-  
-      // Check if the response has content
-      const text = await response.text(); // First read it as text
-      let data;
-      if (text) {
-        // If there's content, try to parse it as JSON
-        data = JSON.parse(text);
-        console.log("Login successful", data);
-        // Handle successful login here, e.g., store token if provided
-      } else {
-        // If there's no content, proceed without parsing
-        console.log("Login successful, no response data");
-        // Handle successful login with no response data here
-      }
-      navigate('/home'); // Redirect to home page on successful login
-    } catch (error) {
-      console.error("Login failed", error);
-      // Handle login failure here, e.g., show error message
-    }
+    await login(email, password); 
   };
   
   return (
