@@ -5,7 +5,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Home from './pages/Home';
 import ProtectedRoute from './components/ProtectedRoute';
-import { AuthProvider } from './context/AuthContext'; // Adjust the path based on your directory structure
+import { AuthProvider } from './contexts/AuthContext'; // Adjust the path based on your directory structure
 
 
 function App() {

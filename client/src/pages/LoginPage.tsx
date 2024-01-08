@@ -14,7 +14,7 @@ import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import entryImage from "../resources/entryimage.png";
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 
 
 const theme = createTheme({
